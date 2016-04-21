@@ -7,27 +7,50 @@ var Snake = require('./snake');
 var nextId = 1;
 var snakes = [];
 var food;
+
+/*var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');*/
+
 module.exports = function (io) {
     /**
      * Controla la conexión de un jugador. Le asigna una id y configura los sockets que se comunican con el cliente.
      */
     io.on('connection', function (client) {
         var id = nextId;
+        //var id;
         var snake = new Snake(id);
-
-        nextId += 1;
         snakes.push(snake);
+        //nextId += 1;
 
         console.log('connexio: ' + id);
 
         client.emit('id', id);
 
+        /**
+         * Cuando reciba la id de un nuevo jugador, la inserta en la base de datos.
+         */
+        /*client.on('id', function (newId) {
+            id = newId;
+            db.snake.insert({"name": id});
+        });*/
+
+        //var snake = new Snake(id);
+        //snakes.push(snake);
+        /**
+         * Cambia la dirección de la serpiente.
+         */
         client.on('move', function (direction) {
             snake.direction = direction;
         });
 
+        /**
+         * Si el usuario se desconecta, guarda su puntuación en la base de datos.
+         */
         client.on('disconnect', function () {
             snakes.remove(snake);
+            /*db.snake.update({name: snake.id}, 
+                {$push: {"score": snake.score, "deaths": snake.deaths}}
+            );*/
             console.log('desconnexio: ' + id);
         });
     });

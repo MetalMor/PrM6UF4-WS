@@ -3,7 +3,7 @@ if (window["WebSocket"]) {
 
         var canvas = $("#map");
         var context = canvas.get(0).getContext("2d");
-        var id = null;
+        var id/* = prompt("Introdueix el teu nom d'usuari: ")*/;
 
         var socket = io.connect(document.location.href);
         var direction;
@@ -28,7 +28,7 @@ if (window["WebSocket"]) {
             }
         }
 
-        function animate(data) {
+        function drawMap(data) {
 
             var snakes = data.snakes;
             food = data.food;
@@ -73,9 +73,10 @@ if (window["WebSocket"]) {
             socket.on('id', function (resId) {
                 id = resId;
             });
+            //socket.emit('id', id);
 
             socket.on('snakes', function (snakes) {
-                animate(snakes);
+                drawMap(snakes);
             });
         }
 
