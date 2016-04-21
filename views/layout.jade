@@ -1,0 +1,13 @@
+doctype html
+html
+    head
+        title= title
+        meta(name='author', content='mor')
+        link(href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.0/flatly/bootstrap.min.css", rel="stylesheet")
+        link(href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css')
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        script(src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js")
+        script(src="/socket.io/socket.io.js")
+        script(src="/public/client.js")
+    body
+        block content
