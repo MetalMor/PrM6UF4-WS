@@ -61,8 +61,6 @@ if (window["WebSocket"]) {
                         x = bodyElement[0] * 10;
                         y = bodyElement[1] * 10;
                         res.push(context.fillRect(x, y, 9, 9));
-                        console.log("element: " + bodyElement);
-                        console.log("comida: " + food);
                     }
                     return res;
                 })());
@@ -98,6 +96,8 @@ if (window["WebSocket"]) {
                     break;
                 case 83:
                     direction = direction != 'u' ? 'd' : direction;
+                    break;
+                default:
                     break;
             }
             console.log(direction);
