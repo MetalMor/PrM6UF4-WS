@@ -6,54 +6,120 @@
 var Snake = require('./snake');
 var nextId = 1;
 var snakes = [];
+var mongo = require('./mongo');
 var food;
 
-/*var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');*/
+var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectId;
+var assert = require('assert');
+var dbUrl = 'mongodb://localhost:27017/snake';
 
 module.exports = function (io) {
+
     /**
      * Controla la conexión de un jugador. Le asigna una id y configura los sockets que se comunican con el cliente.
      */
-    io.on('connection', function (client) {
-        var id = nextId;
-        //var id;
-        var snake = new Snake(id);
-        snakes.push(snake);
+    io.on('connection', function (socket) {
+        //var id = nextId;
+        var id;
+        var snake;
+        //var ten = 0;
+        var ten = mongo.topTenPlayers();
+        //var snake = new Snake(id);
+        //snakes.push(snake);
         //nextId += 1;
 
-        console.log('connexio: ' + id);
-
-        client.emit('id', id);
+        //socket.emit('id', id);
 
         /**
          * Cuando reciba la id de un nuevo jugador, la inserta en la base de datos.
          */
-        /*client.on('id', function (newId) {
+        socket.on('id', function (newId) {
             id = newId;
-            db.snake.insert({"name": id});
-        });*/
+            mongo.insertPlayer(id);
+            snake = new Snake(id);
+            snakes.push(snake);
+            console.log('connexio: ' + id);
+        });
 
-        //var snake = new Snake(id);
-        //snakes.push(snake);
+        socket.emit('top', ten);
         /**
          * Cambia la dirección de la serpiente.
          */
-        client.on('move', function (direction) {
+        socket.on('move', function (direction) {
             snake.direction = direction;
         });
 
         /**
          * Si el usuario se desconecta, guarda su puntuación en la base de datos.
          */
-        client.on('disconnect', function () {
-            snakes.remove(snake);
-            /*db.snake.update({name: snake.id}, 
-                {$push: {"score": snake.score, "deaths": snake.deaths}}
-            );*/
-            console.log('desconnexio: ' + id);
+        socket.on('disconnect', function () {
+            if(id !== undefined) {
+                snakes.remove(snake);
+                mongo.updatePlayerScore(id);
+                console.log('desconnexio: ' + id);
+            }
         });
     });
+
+    /***** FUNCIONES DE LA BASE DE DATOS *****/
+
+    /**
+     * Printa un error de MongoDB
+     * @param err Objeto error
+     */
+    function showError(err) {
+        if(!assert.equal(null, err))
+            console.log(err.statusCode+": "+err.message);
+    }
+    /**
+     * Inserta un jugador en la BD.
+     * @param id Nombre del jugador.
+     */
+    function insertPlayer(id) {
+        MongoClient.connect(dbUrl, function (err, db) {
+            assert.equal(null, err);
+            //db.snake.insert({"name": snake.id, "score": snake.score, "deaths": snake.deaths}, db.close());
+            db.collection('snake').insertOne({"name": id}, db.close());
+        });
+    }
+
+    /**
+     * Muestra los 10 jugadores con mayor puntuación
+     * @returns {Array} Array de los 10 jugadores con la puntuación más alta
+     */
+    function topTenPlayers() {
+        var ret = [];
+        var top;
+        MongoClient.connect(dbUrl, function (err, db) {
+            assert.equal(null, err);
+            top = db.collection('snake').find().sort({
+                "score": -1
+            });
+            if (top !== undefined) {
+                top.each(function (err, doc) {
+                    assert.equal(null, err);
+                    if (doc != null) ret.push(doc.name + ': ' + doc.score);
+                }, db.close());
+            }
+        });
+        return ret;
+    }
+
+    function updatePlayerScore(snake) {
+        MongoClient.connect(dbUrl, function (err, db) {
+            assert.equal(null, err);
+            db.collection('snake').updateOne({
+                "name": snake.id
+            }, {
+                $set: {
+                    "score": snake.score
+                }
+            }, db.close());
+        });
+    }
+
+    /***** FUNCIONES DE LAS SERPIENTES *****/
 
     /**
      * Actualiza el estado de las serpientes y envía al cliente los datos necesarios para dibujarlas en el canvas.

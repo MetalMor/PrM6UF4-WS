@@ -6,6 +6,9 @@ var io = require('socket.io')(server);
 
 var PORT = 3000;
 
+var view = 'snake';
+var title = 'JGF - Snake';
+
 // ***** IMPORTA EL MOTOR JADE *****
 app.set('view engine', 'jade');
 
@@ -13,8 +16,7 @@ app.set('view engine', 'jade');
 app.use('/public', express.static(__dirname + '/views/public/'));
 
 app.get('/', function (req, res) {
-    //res.sendFile(__dirname + '/views/index.html');
-    res.render('snake', {title: 'JGF - Snake'});
+    res.render(view, {title: title});
 });
 
 server.listen(PORT);
