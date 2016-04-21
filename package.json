@@ -1,0 +1,14 @@
+{
+  "name": "JGF-Snake",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.13.4",
+    "socket.io": "^1.4.5"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "description": "Snake multijugador",
+  "main": "app.js",
+  "devDependencies": {}
+}
