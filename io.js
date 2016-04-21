@@ -3,7 +3,7 @@
  * @type {Snake} Modelo de objeto snake
  */
 
-var Snake = require('./snake2');
+var Snake = require('./snake');
 var nextId = 1;
 var snakes = [];
 var food;
