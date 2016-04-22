@@ -33,7 +33,7 @@ var mongo = {
      * Muestra los 10 jugadores con mayor puntuación
      * @returns {Array} Array de los 10 jugadores con la puntuación más alta
      */
-    topTenPlayers: function () {
+    topTenPlayers: function() {
         var ret = [];
         var top;
         MongoClient.connect(dbUrl, function (err, db) {
@@ -44,8 +44,8 @@ var mongo = {
                 top.each(function(err, doc){
                     assert.equal(null, err);
                     doc != null ? ret.push(doc) : db.close();
+                    console.log(ret[ret.length-1]);
                 });
-                console.log(ret);
             });
             /*if(err === null) {
                 db.open(function(err, client){
