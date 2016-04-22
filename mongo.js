@@ -4,17 +4,10 @@
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
+
 var dbUrl = 'mongodb://localhost:27017/snake';
 
-var connectError = "No s'ha pogut connectar amb la base de dades: ";
-var dbOpenError = "Error amb la base de dades";
-
 var mongo = {
-
-    showError: function(err) {
-        if (err !== null)
-            console.log("error " + err.code + ": " + err.message);
-    },
 
     /**
      * Inserta un jugador en la BD.
@@ -44,31 +37,11 @@ var mongo = {
                 top.each(function(err, doc){
                     assert.equal(null, err);
                     doc != null ? ret.push(doc) : db.close();
-                    console.log(ret[ret.length-1]);
                 });
+                console.log(ret);
+                return ret;
             });
-            /*if(err === null) {
-                db.open(function(err, client){
-                    if (err === null) {
-                        top = client.collection('snake').find({
-                            score: {$exists: true} // tiene atributo score
-                        });
-                        //top.sort({score: -1, deaths: 1});
-                    }
-                    else console.log(dbOpenError);
-                    if (top !== undefined) {
-                        // ERROR el parametro doc está saliendo null
-                        top.each(function (err, doc) {
-                            console.dir("doc: " + doc);
-                            if (doc != null) ret.push(doc);
-                        });
-                    }
-                });
-            } else {
-                console.log(connectError);
-            }*/
         });
-        return ret;
     },
     /**
      * Actualiza la puntuación de un jugador en la base de datos

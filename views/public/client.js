@@ -24,8 +24,8 @@ if (window["WebSocket"]) {
 
         function drawFood(food) {
             context.fillStyle = 'rgb(0,255,0)';
-            for (var x = 0; x <= /*MAP_W*/49; x++) {
-                for (var y = 0; y <= /*MAP_H*/49; y++) {
+            for (var x = 0; x <= 49; x++) {
+                for (var y = 0; y <= 49; y++) {
                     if (x === food[0] && y === food[1])
                         context.fillRect(x * 10, y * 10, 9, 9);
                 }
@@ -40,8 +40,8 @@ if (window["WebSocket"]) {
             var bodyElement;
             context.fillStyle = 'rgb(230,230,230)';
 
-            for (var x = 0; x <= /*MAP_W*/49; x++) {
-                for (var y = 0; y <= /*MAP_H*/49; y++) {
+            for (var x = 0; x <= 49; x++) {
+                for (var y = 0; y <= 49; y++) {
                     context.fillRect(x * 10, y * 10, 9, 9);
                 }
             }
@@ -74,16 +74,9 @@ if (window["WebSocket"]) {
         }
 
         function connect() {
-            /*socket.on('id', function(resId) {
-                id = resId;
-            });*/
             socket.emit('id', id);
 
             socket.on('snakes', function(data) {
-                /*var sampleSnake = data.snakes[0];
-                console.log(data);
-                MAP_W = sampleSnake.MAP_W;
-                MAP_H = sampleSnake.MAP_H;*/
                 drawMap(data);
             });
 

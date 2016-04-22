@@ -4,13 +4,10 @@
  */
 
 var Snake = require('./snake');
-var snakes = [];
 var mongo = require('./mongo');
-var food;
 
-var MongoClient = require('mongodb').MongoClient;
-var ObjectId = require('mongodb').ObjectId;
-var dbUrl = 'mongodb://localhost:27017/snake';
+var snakes = [];
+var food;
 
 module.exports = function (io) {
 
@@ -18,16 +15,9 @@ module.exports = function (io) {
      * Controla la conexión de un jugador. Le asigna una id y configura los sockets que se comunican con el cliente.
      */
     io.on('connection', function (socket) {
-        //var id = nextId;
         var id;
         var snake;
-        //var ten = 0;
         var ten = mongo.topTenPlayers();
-        //var snake = new Snake(id);
-        //snakes.push(snake);
-        //nextId += 1;
-
-        //socket.emit('id', id);
 
         /**
          * Cuando reciba la id de un nuevo jugador, la inserta en la base de datos.
@@ -40,7 +30,7 @@ module.exports = function (io) {
             snakes.push(snake);
             console.log('connexio: ' + id);
         });
-
+        console.log(ten);
         socket.emit('top', ten);
         /**
          * Cambia la dirección de la serpiente.
