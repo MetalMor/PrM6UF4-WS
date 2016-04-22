@@ -6,15 +6,16 @@ var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
 var dbUrl = 'mongodb://localhost:27017/snake';
 
+var connectError = "No s'ha pogut connectar amb la base de dades: ";
+var dbOpenError = "Error amb la base de dades";
+
 var mongo = {
-    /**
-     * Printa un error de MongoDB
-     * @param err Objeto error
-     */
-    showError: function (err) {
-        if (!assert.equal(null, err))
-            console.log(err.statusCode + ": " + err.message);
+
+    showError: function(err) {
+        if (err !== null)
+            console.log("error " + err.code + ": " + err.message);
     },
+
     /**
      * Inserta un jugador en la BD.
      * @param id Nombre del jugador.
@@ -24,7 +25,7 @@ var mongo = {
             assert.equal(null, err);
             db.open(function(err, client) {
                 assert.equal(null, err);
-                client.collection('snake').insertOne({"name": id}/*, db.close*/);
+                client.collection('snake').insertOne({name: id});
             });
         });
     },
@@ -36,23 +37,36 @@ var mongo = {
         var ret = [];
         var top;
         MongoClient.connect(dbUrl, function (err, db) {
-            assert.equal(null, err);
             db.open(function(err, client){
                 assert.equal(null, err);
-                top = client.collection('snake').find({
-                    "score": {$exists: true}, // tiene atributo score
-                }).sort({
-                    "score": -1,
-                    "deaths": 1
+                top = client.collection('snake').find({score: {$exists: true}});
+                top.sort({score: -1, deaths: 1});
+                top.each(function(err, doc){
+                    assert.equal(null, err);
+                    doc != null ? ret.push(doc) : db.close();
                 });
-                if (top !== undefined) {
-                    // ERROR el parametro doc está saliendo null
-                    top.forEach(function(doc) {
-                        console.log(doc);
-                        if (doc != null) ret.push(doc);
-                    });
-                }
+                console.log(ret);
             });
+            /*if(err === null) {
+                db.open(function(err, client){
+                    if (err === null) {
+                        top = client.collection('snake').find({
+                            score: {$exists: true} // tiene atributo score
+                        });
+                        //top.sort({score: -1, deaths: 1});
+                    }
+                    else console.log(dbOpenError);
+                    if (top !== undefined) {
+                        // ERROR el parametro doc está saliendo null
+                        top.each(function (err, doc) {
+                            console.dir("doc: " + doc);
+                            if (doc != null) ret.push(doc);
+                        });
+                    }
+                });
+            } else {
+                console.log(connectError);
+            }*/
         });
         return ret;
     },
@@ -65,14 +79,8 @@ var mongo = {
             assert.equal(null, err);
             db.open(function(err, client) {
                 assert.equal(null, err);
-                client.collection('snake').updateOne({
-                    "name": snake.id
-                }, {
-                    $set: {
-                        "score": snake.score,
-                        "deaths": snake.deaths
-                    }
-                }/*, db.close()*/);
+                client.collection('snake').updateOne({name: snake.id},
+                    {$set: {score: snake.score, deaths: snake.deaths}});
             });
         });
     }

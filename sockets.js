@@ -4,14 +4,12 @@
  */
 
 var Snake = require('./snake');
-var nextId = 1;
 var snakes = [];
 var mongo = require('./mongo');
 var food;
 
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
-var assert = require('assert');
 var dbUrl = 'mongodb://localhost:27017/snake';
 
 module.exports = function (io) {
@@ -35,7 +33,8 @@ module.exports = function (io) {
          * Cuando reciba la id de un nuevo jugador, la inserta en la base de datos.
          */
         socket.on('id', function (newId) {
-            id = newId;
+            var defId = "player"+randomNumber(100);
+            id = newId != null || newId != "" ? newId : defId;
             mongo.insertPlayer(id);
             snake = new Snake(id);
             snakes.push(snake);
@@ -56,68 +55,11 @@ module.exports = function (io) {
         socket.on('disconnect', function () {
             if(id !== undefined) {
                 snakes.remove(snake);
-                mongo.updatePlayerScore(id);
+                mongo.updatePlayerScore(snake);
                 console.log('desconnexio: ' + id);
             }
         });
     });
-
-    /***** FUNCIONES DE LA BASE DE DATOS *****/
-
-    /**
-     * Printa un error de MongoDB
-     * @param err Objeto error
-     */
-    function showError(err) {
-        if(!assert.equal(null, err))
-            console.log(err.statusCode+": "+err.message);
-    }
-    /**
-     * Inserta un jugador en la BD.
-     * @param id Nombre del jugador.
-     */
-    function insertPlayer(id) {
-        MongoClient.connect(dbUrl, function (err, db) {
-            assert.equal(null, err);
-            //db.snake.insert({"name": snake.id, "score": snake.score, "deaths": snake.deaths}, db.close());
-            db.collection('snake').insertOne({"name": id}, db.close());
-        });
-    }
-
-    /**
-     * Muestra los 10 jugadores con mayor puntuación
-     * @returns {Array} Array de los 10 jugadores con la puntuación más alta
-     */
-    function topTenPlayers() {
-        var ret = [];
-        var top;
-        MongoClient.connect(dbUrl, function (err, db) {
-            assert.equal(null, err);
-            top = db.collection('snake').find().sort({
-                "score": -1
-            });
-            if (top !== undefined) {
-                top.each(function (err, doc) {
-                    assert.equal(null, err);
-                    if (doc != null) ret.push(doc.name + ': ' + doc.score);
-                }, db.close());
-            }
-        });
-        return ret;
-    }
-
-    function updatePlayerScore(snake) {
-        MongoClient.connect(dbUrl, function (err, db) {
-            assert.equal(null, err);
-            db.collection('snake').updateOne({
-                "name": snake.id
-            }, {
-                $set: {
-                    "score": snake.score
-                }
-            }, db.close());
-        });
-    }
 
     /***** FUNCIONES DE LAS SERPIENTES *****/
 
@@ -182,7 +124,7 @@ module.exports = function (io) {
      * @returns {*[]}
      */
     function generateFood() {
-        return [randomNumber(), randomNumber()];
+        return [randomNumber(49), randomNumber(49)];
     }
 
     /**
@@ -196,8 +138,8 @@ module.exports = function (io) {
      * Devuelve un número aleatorio (máximo: tamaño del mapa)
      * @returns {number} Número aleatorio.
      */
-    function randomNumber() {
-        return Math.floor((Math.random() * 48) + 1);
+    function randomNumber(max) {
+        return Math.floor((Math.random() * max) + 1);
     }
 
     /**
