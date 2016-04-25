@@ -100,33 +100,33 @@ var Snake = function (id) {
      * @returns {number}
      */
     this.moveHead = function () {
-        var head = this.head;
+        var head = this.length - 1;
         // comprueba la direccion de la serpiente
         switch (this.direction) {
             case "l":
-                head[0] -= 1;
+                this.body[head][0] -= 1;
                 break;
             case "r":
-                head[0] += 1;
+                this.body[head][0] += 1;
                 break;
             case "u":
-                head[1] -= 1;
+                this.body[head][1] -= 1;
                 break;
             case "d":
-                head[1] += 1;
+                this.body[head][1] += 1;
         }
         // comprueba el final del mapa
-        if (head[0] < 0) {
-            head[0] = this.MAP_W;
+        if (this.body[head][0] < 0) {
+            this.body[head][0] = this.MAP_W;
         }
-        if (head[1] < 0) {
-            head[1] = this.MAP_H;
+        if (this.body[head][1] < 0) {
+            this.body[head][1] = this.MAP_H;
         }
-        if (head[0] > this.MAP_W) {
-            head[0] = 0;
+        if (this.body[head][0] > this.MAP_W) {
+            this.body[head][0] = 0;
         }
-        if (head[1] > this.MAP_H) {
-            return head[1] = 0;
+        if (this.body[head][1] > this.MAP_H) {
+            return this.body[head][1] = 0;
         }
     };
 

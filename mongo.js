@@ -52,7 +52,7 @@ var mongo = {
                     ret.each(function (err, doc) {
                         assert.equal(null, err);
                         if (doc != null && mongo.ten.length < 10) mongo.ten.push(doc);
-                        else db.close(mongo.showTop());
+                        else db.close();
                     });
                 }
             });
