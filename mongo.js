@@ -9,6 +9,15 @@ var dbUrl = 'mongodb://localhost:27017/snake';
 
 var mongo = {
 
+    ten: [],
+
+    showTop: function() {
+        var top = mongo.ten;
+        var len = top.length;
+        console.log("top: ");
+        for (var counter = 0; counter < len; counter++)
+            console.log(top[counter]);
+    },
     /**
      * Inserta un jugador en la BD.
      * @param id Nombre del jugador.
@@ -18,6 +27,7 @@ var mongo = {
             assert.equal(null, err);
             db.open(function(err, client) {
                 assert.equal(null, err);
+                console.log("[mongo] nueva snake: " + id);
                 client.collection('snake').insertOne({name: id});
             });
         });
@@ -27,35 +37,41 @@ var mongo = {
      * @returns {Array} Array de los 10 jugadores con la puntuación más alta
      */
     topTenPlayers: function() {
-        var ret = [];
-        var top;
         MongoClient.connect(dbUrl, function (err, db) {
+            mongo.top = [];
+            console.log("[mongo] checkin top");
             db.open(function(err, client){
                 assert.equal(null, err);
-                top = client.collection('snake').find({score: {$exists: true}});
-                top.sort({score: -1, deaths: 1});
-                top.each(function(err, doc){
-                    assert.equal(null, err);
-                    doc != null ? ret.push(doc) : db.close();
-                });
-                console.log(ret);
-                return ret;
+                var ret = client.collection('snake').find({score: {$exists: true}});
+                ret.sort({score: -1, deaths: 1});
+                if(mongo.top.length === 0) {
+                    ret.each(function (err, doc) {
+                        assert.equal(null, err);
+                        if (doc != null && mongo.ten.length < 10) mongo.ten.push(doc);
+                    });
+                }
             });
         });
+        mongo.showTop();
     },
     /**
      * Actualiza la puntuación de un jugador en la base de datos
      * @param snake Usuario a actualizar
      */
     updatePlayerScore: function (snake) {
+        var id = snake.id;
         MongoClient.connect(dbUrl, function (err, db) {
             assert.equal(null, err);
             db.open(function(err, client) {
                 assert.equal(null, err);
-                client.collection('snake').updateOne({name: snake.id},
-                    {$set: {score: snake.score, deaths: snake.deaths}});
+                console.log("[mongo] actualizando snake: " + id);
+                client.collection('snake').deleteMany({score: {$exists: false}},
+                    client.collection('snake').updateOne({name: id, score: {$exists: true}},
+                        {$set: {score: snake.score, deaths: snake.deaths}})
+                );
             });
         });
+        mongo.topTenPlayers();
     }
 };
 

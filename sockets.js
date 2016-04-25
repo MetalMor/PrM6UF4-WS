@@ -8,30 +8,27 @@ var mongo = require('./mongo');
 
 var snakes = [];
 var food;
+var ten = mongo.topTenPlayers();
 
 module.exports = function (io) {
-
     /**
      * Controla la conexión de un jugador. Le asigna una id y configura los sockets que se comunican con el cliente.
      */
     io.on('connection', function (socket) {
         var id;
         var snake;
-        var ten = mongo.topTenPlayers();
-
+        mongo.topTenPlayers();
         /**
          * Cuando reciba la id de un nuevo jugador, la inserta en la base de datos.
          */
         socket.on('id', function (newId) {
-            var defId = "player"+randomNumber(100);
-            id = newId != null || newId != "" ? newId : defId;
+            id = generaId(newId);
             mongo.insertPlayer(id);
             snake = new Snake(id);
             snakes.push(snake);
             console.log('connexio: ' + id);
+            socket.emit('top', mongo.ten);
         });
-        console.log(ten);
-        socket.emit('top', ten);
         /**
          * Cambia la dirección de la serpiente.
          */
@@ -45,13 +42,16 @@ module.exports = function (io) {
         socket.on('disconnect', function () {
             if(id !== undefined) {
                 snakes.remove(snake);
-                mongo.updatePlayerScore(snake);
                 console.log('desconnexio: ' + id);
             }
         });
     });
 
     /***** FUNCIONES DE LAS SERPIENTES *****/
+
+    function generaId(newId) {
+        return newId === null || newId === "" ? "player"+randomNumber(100) : newId;
+    }
 
     /**
      * Actualiza el estado de las serpientes y envía al cliente los datos necesarios para dibujarlas en el canvas.
@@ -65,6 +65,7 @@ module.exports = function (io) {
             snake.step();
         }
         checkCollisions();
+        io.emit('top', mongo.ten);
         return io.emit('snakes', {snakes: snakes, food: food});
     }
 
@@ -82,20 +83,19 @@ module.exports = function (io) {
         var other;
         for (var i = 0; i < len; i++) {
             snake = snakes[i];
-            if (snake.blocksSelf()) {
+            if (snake.blocksSelf())
                 snakeReset.push(snake);
-            }
             for (var j = 0; j < len; j++) {
                 other = snakes[j];
                 if (other !== snake) {
-                    if (other.blocks(snake)) {
+                    if (other.blocks(snake))
                         snakeReset.push(snake);
-                        other.addScore();
-                    }
                 }
             }
             if (snake.blocksFood(food)) {
                 snake.addScore();
+                mongo.updatePlayerScore(snake);
+                mongo.topTenPlayers();
                 newFood();
             }
         }
@@ -104,6 +104,8 @@ module.exports = function (io) {
         for (var k = 0; k < len3; k++) {
             snake = snakeReset[k];
             ret.push(snake.reset());
+            mongo.updatePlayerScore(snake);
+            mongo.topTenPlayers();
         }
         return ret;
     }
@@ -122,6 +124,7 @@ module.exports = function (io) {
      */
     function newFood() {
         food = generateFood();
+        mongo.topTenPlayers();
     }
 
     /**

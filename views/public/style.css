@@ -1,25 +1,35 @@
 body {
-	background-color: #fff;
-	color: #222;
+    background-color: #fff;
+    color: #222;
 }
 
 h1 {
-	font-weight: bold; 	
-	padding: 10px;
-	padding-bottom: 0px;
-	margin-bottom: 2px;
-	text-align: center;
-	font-size: 32px;
+    font-weight: bold;
+    padding: 10px;
+    padding-bottom: 0px;
+    margin-bottom: 2px;
+    text-align: center;
+    font-size: 32px;
     font-family: 'Montserrat', sans-serif;
 }
 
+#top {
+    float: left;
+    margin: 10%;
+}
+
 #scoreboard {
-  text-align: center;
-  padding: 0;
-  padding-bottom: 12px;
+    float: left;
+    margin: 10%;
+    padding-bottom: 12px;
+}
+
+#container {
+    text-align: center;
 }
 
 #map {
-	display: block;
-	margin: 5%;
+    float: right;
+    display: block;
+    margin: 5%;
 }

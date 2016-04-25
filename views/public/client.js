@@ -9,6 +9,7 @@ if (window["WebSocket"]) {
 
         var direction;
         var food;
+        var top = [];
         var MAP_H;
         var MAP_W;
 
@@ -73,16 +74,23 @@ if (window["WebSocket"]) {
             return ret;
         }
 
+        function topEntry(curTop) {
+            return "<li>" + curTop.name + " - " + curTop.score + " - " + curTop.deaths + "</li>";
+        }
+
         function connect() {
             socket.emit('id', id);
-
+            socket.on('top', function(ten) {
+                var element = $("ol#top");
+                console.log("server top: " + ten);
+                if(!top.compare(ten)) {
+                    element.empty();
+                    for(var counter = 0; counter < 10; counter++)
+                        element.append(topEntry(ten[counter]));
+                }
+            });
             socket.on('snakes', function(data) {
                 drawMap(data);
-            });
-
-            socket.on('top', function(top) {
-                console.log(top);
-                // TODO
             });
         }
 
@@ -114,3 +122,14 @@ if (window["WebSocket"]) {
 } else {
     alert('NO SUPORTA WEBSOCKETS!');
 }
+
+Array.prototype.compare = function(testArr) {
+    if (this.length != testArr.length) return false;
+    for (var i = 0; i < testArr.length; i++) {
+        if (this[i].compare) {
+            if (!this[i].compare(testArr[i])) return false;
+        }
+        if (this[i] !== testArr[i]) return false;
+    }
+    return true;
+};

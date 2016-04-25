@@ -38,7 +38,7 @@ var Snake = function (id) {
      * Añade un cuadradito a la serpiente e incrementa su puntuación
      * @returns {Number}
      */
-    this.addScore = function () {
+    this.addScore = function() {
         this.score++;
         return this.length = this.body.unshift([-1, -1]);
     };
