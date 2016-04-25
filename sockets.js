@@ -1,14 +1,16 @@
 /**
+ * Created by mor on 25/04/16.
+ */
+/**
  * Control de la comunicación cliente-servidor vía websockets
  * @type {Snake} Modelo de objeto snake
  */
-
 var Snake = require('./snake');
 var mongo = require('./mongo');
 
 var snakes = [];
 var food;
-var ten = mongo.topTenPlayers();
+
 
 module.exports = function (io) {
     /**
@@ -40,8 +42,9 @@ module.exports = function (io) {
          * Si el usuario se desconecta, guarda su puntuación en la base de datos.
          */
         socket.on('disconnect', function () {
-            if(id !== undefined) {
+            if(id !== undefined && id !== null) {
                 snakes.remove(snake);
+                mongo.updatePlayerScore(snake);
                 console.log('desconnexio: ' + id);
             }
         });
@@ -119,11 +122,19 @@ module.exports = function (io) {
         return [randomNumber(49), randomNumber(49)];
     }
 
+    function foodAvPosition() {
+        var len = snakes.length;
+        for (var i = 0; i<len; i++) {
+            if(snakes[i].blocksFood(food)) return false;
+        }
+        return true;
+    }
+
     /**
      * Asigna unas nuevas coordenadas a la variable que guarda la posición de la comida.
      */
     function newFood() {
-        food = generateFood();
+        do {food = generateFood()} while(!foodAvPosition());
         mongo.topTenPlayers();
     }
 

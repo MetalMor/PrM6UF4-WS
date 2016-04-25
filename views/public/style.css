@@ -5,7 +5,7 @@ body {
 
 h1 {
     font-weight: bold;
-    padding: 10px;
+    padding: 8px;
     padding-bottom: 0px;
     margin-bottom: 2px;
     text-align: center;
@@ -15,13 +15,13 @@ h1 {
 
 #top {
     float: left;
-    margin: 10%;
+    margin: 5%;
 }
 
 #scoreboard {
     float: left;
-    margin: 10%;
-    padding-bottom: 12px;
+    margin: 5%;
+    padding-bottom: 5px;
 }
 
 #container {

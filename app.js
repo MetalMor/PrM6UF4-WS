@@ -23,4 +23,4 @@ server.listen(PORT);
 console.log('escoltant pel port ' + PORT);
 
 // ***** EJECUTA LOS SOCKETS! *****
-require('./sockets')(io);
+require('./sockets.js')(io);
