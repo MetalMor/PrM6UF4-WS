@@ -157,6 +157,8 @@ module.exports = function (io) {
         }
     };
 
-    newFood();
-    var interval = setInterval(updateState, 100);
+    mongo.initConnection(function () {
+      newFood();
+      var interval = setInterval(updateState, 100);
+    });
 };

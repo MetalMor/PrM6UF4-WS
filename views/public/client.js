@@ -85,7 +85,7 @@ if (window["WebSocket"]) {
                 console.log("server top: " + ten);
                 if(!top.compare(ten)) {
                     element.empty();
-                    for(var counter = 0; counter < 10; counter++)
+                    for(var counter = 0; counter < 10 && counter < ten.length; counter++)
                         element.append(topEntry(ten[counter]));
                 }
             });
@@ -98,6 +98,8 @@ if (window["WebSocket"]) {
 
         return $(document).keydown(function(event) {
             var key = event.keyCode ? event.keyCode : event.which;
+            var validMove = true;
+            console.log('keydown', event);
             switch (key) {
                 case 65:
                     direction = direction != 'r' ? 'l' : direction;
@@ -112,10 +114,13 @@ if (window["WebSocket"]) {
                     direction = direction != 'u' ? 'd' : direction;
                     break;
                 default:
+                    validMove = false;
                     break;
             }
-            console.log(direction);
-            return sendDirection(direction);
+            if (validMove) {
+              console.log(direction);
+              return sendDirection(direction);
+            }
         });
     });
 
