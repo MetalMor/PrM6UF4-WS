@@ -5,9 +5,7 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
 
-var dbName = process.env.NODE_ENV === 'production' ? 'heroku_c7df1h0n' : '127.0.0.1';
-
-var dbUrl = 'mongodb://127.0.0.1:27017/snake';
+var dbUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/snake';
 
 var mongo = {
 
